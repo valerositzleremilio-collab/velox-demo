@@ -212,13 +212,19 @@
     }
     .statement-word {
       position: absolute; top: 50%; left: 50%;
+      /* PROBLEM 1 FIX: visible by default so words show even if JS is slow */
+      transform: translate(-50%, -50%);
       font-size: clamp(56px, 11vw, 160px);
       font-weight: 900; color: var(--white);
       text-align: center;
       display: flex; flex-direction: column; align-items: center;
       white-space: nowrap;
+      opacity: 0;
     }
-    /* Task 4: OBSESSION in lime */
+    /* word-1 visible immediately; words 2+3 hidden until JS shows them */
+    #word-1 { opacity: 1 !important; }
+    #word-2, #word-3 { opacity: 0; }
+    /* OBSESSION in lime */
     #word-3 { color: var(--lime); }
 
     .statement-word-inner {
@@ -286,6 +292,8 @@
     .spec-card {
       border-top: 2px solid var(--lime);
       padding: 60px 48px; background: transparent;
+      /* PROBLEM 3 FIX: always visible, only y animates */
+      opacity: 1;
     }
     .spec-number {
       font-size: clamp(56px, 9vw, 120px);
@@ -694,57 +702,48 @@
       var speedLines = document.querySelectorAll('.speed-line');
       var speedFired = false;
 
-      function buildHeroTrigger() {
-        video.load();
-        video.pause();
+      /* PROBLEM 2 FIX: just autoplay + loop — no scroll scrub */
+      video.autoplay = true;
+      video.loop     = true;
+      video.muted    = true;
+      video.play().catch(function() {});
 
-        ScrollTrigger.create({
-          trigger: '#hero',
-          start: 'top top', end: 'bottom bottom',
-          scrub: true,
-          onUpdate: function(self) {
-            var p = self.progress;
+      /* Fade hero text out on scroll */
+      ScrollTrigger.create({
+        trigger: '#hero',
+        start: 'top top', end: 'bottom bottom',
+        scrub: true,
+        onUpdate: function(self) {
+          var p = self.progress;
 
-            /* Drive video frame via scroll */
-            if (video.readyState >= 1) {
-              video.currentTime = p * video.duration;
-            }
+          /* Fade OUT hero text at 75–85% */
+          if (p > 0.75) {
+            gsap.set(heroText, { opacity: 1 - Math.min(1, (p - 0.75) / 0.10) });
+          } else {
+            gsap.set(heroText, { opacity: 1 });
+          }
 
-            /* Fade OUT hero text at 75–85% (entrance handled by preloader) */
-            if (p > 0.75) {
-              gsap.set(heroText, { opacity: 1 - Math.min(1, (p - 0.75) / 0.10) });
-            } else {
-              gsap.set(heroText, { opacity: 1 });
-            }
+          /* Scroll indicator fades out after 10% */
+          gsap.set(indicator, {
+            opacity: p > 0.10 ? Math.max(0, 1 - (p - 0.10) / 0.05) : 1,
+          });
 
-            /* Task 2d: scroll indicator fades out after 10% scroll */
-            gsap.set(indicator, {
-              opacity: p > 0.10 ? Math.max(0, 1 - (p - 0.10) / 0.05) : 1,
-            });
-
-            /* Task 2c: speed lines fire once at 20% progress */
-            if (p >= 0.20 && !speedFired) {
-              speedFired = true;
-              gsap.fromTo(speedLines,
-                { left: '-100%' },
-                {
-                  left: '110%', duration: 0.8, stagger: 0.06, ease: 'power2.in',
-                  onComplete: function() {
-                    gsap.set(speedLines, { left: '-100%' });
-                    speedFired = false;
-                  },
-                }
-              );
-            }
-          },
-        });
-      }
-
-      if (video.readyState >= 1) {
-        buildHeroTrigger();
-      } else {
-        video.addEventListener('loadedmetadata', buildHeroTrigger, { once: true });
-      }
+          /* Speed lines fire once at 20% progress */
+          if (p >= 0.20 && !speedFired) {
+            speedFired = true;
+            gsap.fromTo(speedLines,
+              { left: '-100%' },
+              {
+                left: '110%', duration: 0.8, stagger: 0.06, ease: 'power2.in',
+                onComplete: function() {
+                  gsap.set(speedLines, { left: '-100%' });
+                  speedFired = false;
+                },
+              }
+            );
+          }
+        },
+      });
     })();
 
     /* ════════════════════════════════
@@ -761,15 +760,17 @@
       var lines     = words.map(function(w) { return w.querySelector('.statement-line'); });
       var activeIdx = -1;
 
-      /* Center all words and hide initially */
-      words.forEach(function(w) {
-        gsap.set(w, { xPercent: -50, yPercent: -50, opacity: 0, scale: 0.85 });
+      /* PROBLEM 1 FIX: set all words centered; word-1 starts visible (CSS opacity:1) */
+      words.forEach(function(w, i) {
+        gsap.set(w, { xPercent: -50, yPercent: -50, y: 0, scale: 1,
+                      opacity: i === 0 ? 1 : 0 });
       });
-      lines.forEach(function(l) { gsap.set(l, { scaleX: 0 }); });
+      lines.forEach(function(l, i) { gsap.set(l, { scaleX: i === 0 ? 1 : 0 }); });
+      activeIdx = 0;
 
       function showWord(idx, prevIdx) {
         /* Exit the previous word — slam out */
-        if (prevIdx >= 0) {
+        if (prevIdx >= 0 && prevIdx !== idx) {
           gsap.to(words[prevIdx], {
             y: -50, scale: 1.1, opacity: 0,
             duration: 0.3, ease: 'power3.in', overwrite: true,
@@ -782,7 +783,7 @@
           { xPercent: -50, yPercent: -50, y: 0,  scale: 1,    opacity: 1, skewX:  0,
             duration: 0.45, ease: 'power4.out', overwrite: true }
         );
-        /* Line sweeps in behind the word */
+        /* Line sweeps in */
         gsap.fromTo(lines[idx],
           { scaleX: 0 },
           { scaleX: 1, duration: 0.6, ease: 'power2.out' }
@@ -792,6 +793,7 @@
       ScrollTrigger.create({
         trigger: '#statement',
         start: 'top top', end: 'bottom bottom',
+        scrub: false,
         onUpdate: function(self) {
           /* Map progress to 3 equal zones: 0, 1, 2 */
           var newIdx = Math.min(2, Math.floor(self.progress * 3));
@@ -802,6 +804,13 @@
           }
         },
       });
+
+      /* PROBLEM 1 FALLBACK: if no ScrollTriggers after 500ms, refresh */
+      setTimeout(function() {
+        if (ScrollTrigger.getAll().length === 0) {
+          ScrollTrigger.refresh();
+        }
+      }, 500);
     })();
 
     /* ════════════════════════════════
@@ -834,11 +843,13 @@
     (function initSpecs() {
       var cards = document.querySelectorAll('.spec-card');
 
-      gsap.set(cards, { opacity: 0, y: 50 });
+      /* PROBLEM 3 FIX: cards are always visible (CSS opacity:1)
+         Only animate y — not opacity — so they're never hidden */
+      gsap.set(cards, { y: 60 });
 
       gsap.to(cards, {
-        y: 0, opacity: 1, stagger: 0.15, duration: 0.8, ease: 'power2.out',
-        scrollTrigger: { trigger: '#specs', start: 'top 90%', once: true },
+        y: 0, stagger: 0.15, duration: 0.8, ease: 'power2.out',
+        scrollTrigger: { trigger: '#specs', start: 'top 95%', once: true },
       });
 
       cards.forEach(function(card) {
@@ -847,7 +858,7 @@
         var decimals = parseInt(el.dataset.decimals, 10);
 
         ScrollTrigger.create({
-          trigger: card, start: 'top 90%', once: true,
+          trigger: card, start: 'top 95%', once: true,
           onEnter: function() {
             var obj = { val: 0 };
             gsap.to(obj, {
@@ -911,19 +922,19 @@
         return '<span class="final-letter">' + c + '</span>';
       }).join('');
 
-      /* Letters slam in on scroll — fires early at 90% */
+      /* PROBLEM 5 FIX: start at 80% so animation fires late enough */
       gsap.set('.final-letter', { opacity: 0, y: 80 });
       gsap.to('.final-letter', {
         opacity: 1, y: 0,
         stagger: 0.04, duration: 0.7, ease: 'power4.out',
-        scrollTrigger: { trigger: '#final', start: 'top 90%', once: true },
+        scrollTrigger: { trigger: '#final', start: 'top 75%', once: true },
       });
 
-      /* CTA button entrance */
+      /* CTA button — no delay on scrollTrigger version */
       gsap.set('#final-email', { opacity: 0, y: 30 });
       gsap.to('#final-email', {
-        opacity: 1, y: 0, duration: 0.8, ease: 'power3.out', delay: 0.35,
-        scrollTrigger: { trigger: '#final', start: 'top 90%', once: true },
+        opacity: 1, y: 0, duration: 0.8, ease: 'power3.out',
+        scrollTrigger: { trigger: '#final', start: 'top 75%', once: true },
       });
     })();
   </script>
