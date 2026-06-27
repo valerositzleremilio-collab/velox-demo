@@ -124,76 +124,112 @@
     /* ════════════════════════════════
        SECTION 1 — HERO
     ════════════════════════════════ */
-    #hero { height: 250vh; position: relative; }
+    #hero { height: 300vh; position: relative; }
     #hero-sticky {
-      position: sticky; top: 0; height: 100vh; overflow: hidden;
-      background: var(--black);
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #hero-video-wrapper {
+      position: absolute;
+      inset: 0;
+      border-radius: 0px;
+      overflow: hidden;
+      transform-origin: center center;
+      will-change: transform, border-radius;
+      z-index: 1;
     }
     #hero-video {
-      width: 100%; height: 100%; object-fit: cover;
-      position: absolute; top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
-    #hero-vignette {
-      position: absolute; inset: 0;
-      background: radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.75) 100%);
+    #hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(
+        ellipse at center,
+        transparent 20%,
+        rgba(0,0,0,0.65) 100%
+      );
       pointer-events: none;
     }
-    #hero-bottom-gradient {
-      position: absolute; bottom: 0; left: 0;
-      width: 100%; height: 30%;
-      background: linear-gradient(transparent, var(--black));
+    #hero-grey-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(10,10,10,0.75);
+      opacity: 0;
       pointer-events: none;
+      z-index: 2;
     }
-
-    /* Task 2c: speed lines race across screen on scroll */
-    #speed-lines {
-      position: absolute; inset: 0;
-      pointer-events: none; z-index: 5; overflow: hidden;
-    }
-    .speed-line {
-      position: absolute; height: 1px;
-      background: linear-gradient(to right, transparent, rgba(200,241,53,0.4), transparent);
-      left: -100%;
-    }
-    .speed-line:nth-child(1) { top: 15%; width: 45%; }
-    .speed-line:nth-child(2) { top: 28%; width: 60%; }
-    .speed-line:nth-child(3) { top: 42%; width: 35%; }
-    .speed-line:nth-child(4) { top: 58%; width: 55%; }
-    .speed-line:nth-child(5) { top: 71%; width: 40%; }
-    .speed-line:nth-child(6) { top: 85%; width: 50%; }
-
-    /* Task 2a+b: hero text — container visible, children animated */
     #hero-text {
-      position: absolute; top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      z-index: 10; text-align: center;
-      width: 100%; padding: 0 24px;
+      position: absolute;
+      z-index: 10;
+      text-align: center;
+      pointer-events: none;
     }
     #hero-title {
-      font-size: clamp(100px, 20vw, 260px);
-      font-weight: 900; color: var(--white);
-      letter-spacing: -8px; line-height: 0.88;
-      text-shadow: 0 0 120px rgba(200,241,53,0.25);
+      font-size: clamp(80px, 16vw, 240px);
+      font-weight: 900;
+      color: white;
+      letter-spacing: -6px;
+      line-height: 0.9;
+      text-shadow: 0 0 120px rgba(200,241,53,0.2);
     }
     #hero-subtitle {
-      font-size: clamp(10px, 1.2vw, 15px);
-      color: var(--cream); letter-spacing: 10px;
-      text-transform: uppercase; margin-top: 28px;
+      font-size: clamp(10px, 1.2vw, 14px);
+      letter-spacing: 8px;
+      color: var(--cream);
+      text-transform: uppercase;
+      margin-top: 20px;
     }
-
-    /* Task 2d: scroll indicator */
-    #hero-scroll-indicator {
-      position: absolute; bottom: 40px; left: 50%;
+    #hero-marquee-wrap {
+      position: absolute;
+      bottom: 15%;
+      left: 0;
+      right: 0;
+      overflow: hidden;
+      z-index: 20;
+      opacity: 0;
+      pointer-events: none;
+    }
+    #hero-marquee {
+      display: flex;
+      white-space: nowrap;
+      will-change: transform;
+    }
+    #hero-marquee span {
+      font-size: clamp(32px, 6vw, 80px);
+      font-weight: 900;
+      color: white;
+      letter-spacing: -1px;
+      padding-right: 40px;
+      opacity: 0.12;
+    }
+    #scroll-indicator {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
       transform: translateX(-50%);
       z-index: 10;
-      display: flex; flex-direction: column; align-items: center; gap: 10px;
-    }
-    #scroll-text {
-      font-size: 10px; color: var(--cream);
-      letter-spacing: 4px; text-transform: uppercase; opacity: 0.5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      font-size: 10px;
+      color: var(--cream);
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      opacity: 0.5;
     }
     #scroll-line {
-      width: 1px; height: 40px; background: var(--lime);
+      width: 1px;
+      height: 40px;
+      background: var(--lime);
       transform-origin: top center;
       animation: scrollPulse 1.5s ease-in-out infinite;
     }
@@ -201,52 +237,6 @@
       0%   { transform: scaleY(0); opacity: 1; }
       50%  { transform: scaleY(1); opacity: 1; }
       100% { transform: scaleY(1); opacity: 0; }
-    }
-
-    /* ════════════════════════════════
-       HERO — scroll-shrink frame + marquee
-    ════════════════════════════════ */
-    #hero-video-frame {
-      position: absolute;
-      top: 0; right: 0; bottom: 0; left: 0;
-      overflow: hidden;
-    }
-    #hero-video-overlay {
-      position: absolute; inset: 0;
-      background: rgba(18, 18, 18, 0.72);
-      opacity: 0;
-      pointer-events: none;
-      z-index: 6;
-    }
-    #hero-marquee {
-      position: absolute;
-      bottom: 0; left: 0;
-      width: 100%; height: 56px;
-      display: flex; align-items: center;
-      overflow: hidden;
-      opacity: 0;
-      z-index: 20;
-      pointer-events: none;
-    }
-    .marquee-inner {
-      display: flex;
-      animation: marqueeScroll 22s linear infinite;
-      will-change: transform;
-    }
-    .marquee-content {
-      white-space: nowrap;
-      font-family: var(--font-headline);
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 6px;
-      text-transform: uppercase;
-      color: var(--cream);
-      opacity: 0.45;
-      flex-shrink: 0;
-    }
-    @keyframes marqueeScroll {
-      0%   { transform: translateX(0); }
-      100% { transform: translateX(-50%); }
     }
 
     /* ════════════════════════════════
@@ -466,7 +456,6 @@
     #final-headline {
       font-family: var(--font-headline);
       font-weight: 900;
-      letter-spacing: -2px;
     }
 
     @media (max-width: 768px) {
@@ -521,43 +510,30 @@
   <section id="hero">
     <div id="hero-sticky">
 
-      <!-- scroll-shrink frame: shrinks + gets border-radius on scroll -->
-      <div id="hero-video-frame">
-        <video id="hero-video" muted playsinline autoplay preload="auto">
-          <source src="clip1.mp4" type="video/mp4" />
+      <div id="hero-video-wrapper">
+        <video id="hero-video" autoplay muted loop playsinline preload="auto">
+          <source src="clip1.mp4" type="video/mp4">
         </video>
-        <div id="hero-vignette"></div>
-        <div id="hero-bottom-gradient"></div>
-        <!-- Task 2c: speed lines -->
-        <div id="speed-lines">
-          <div class="speed-line"></div>
-          <div class="speed-line"></div>
-          <div class="speed-line"></div>
-          <div class="speed-line"></div>
-          <div class="speed-line"></div>
-          <div class="speed-line"></div>
-        </div>
-        <div id="hero-video-overlay"></div>
+        <div id="hero-overlay"></div>
+        <div id="hero-grey-overlay"></div>
       </div>
 
-      <!-- Task 2a+b: title and subtitle animated after preloader -->
       <div id="hero-text">
-        <div id="hero-title">VELOX</div>
-        <div id="hero-subtitle">Engineered for those who feel.</div>
+        <h1 id="hero-title">VELOX</h1>
+        <p id="hero-subtitle">ENGINEERED FOR THOSE WHO FEEL.</p>
       </div>
 
-      <!-- Task 2d: scroll indicator -->
-      <div id="hero-scroll-indicator">
-        <span id="scroll-text">Scroll</span>
-        <div id="scroll-line"></div>
-      </div>
-
-      <!-- marquee: appears once video is shrunken and frozen -->
-      <div id="hero-marquee">
-        <div class="marquee-inner">
-          <span class="marquee-content">ODDOMODE DEMO&nbsp;&nbsp;&mdash;&nbsp;&nbsp;3D VISUALS&nbsp;&nbsp;&mdash;&nbsp;&nbsp;ODDOMODE DEMO&nbsp;&nbsp;&mdash;&nbsp;&nbsp;3D VISUALS&nbsp;&nbsp;&mdash;&nbsp;&nbsp;ODDOMODE DEMO&nbsp;&nbsp;&mdash;&nbsp;&nbsp;3D VISUALS&nbsp;&nbsp;&mdash;&nbsp;&nbsp;</span>
-          <span class="marquee-content">ODDOMODE DEMO&nbsp;&nbsp;&mdash;&nbsp;&nbsp;3D VISUALS&nbsp;&nbsp;&mdash;&nbsp;&nbsp;ODDOMODE DEMO&nbsp;&nbsp;&mdash;&nbsp;&nbsp;3D VISUALS&nbsp;&nbsp;&mdash;&nbsp;&nbsp;ODDOMODE DEMO&nbsp;&nbsp;&mdash;&nbsp;&nbsp;3D VISUALS&nbsp;&nbsp;&mdash;&nbsp;&nbsp;</span>
+      <div id="hero-marquee-wrap">
+        <div id="hero-marquee">
+          <span>ODDOMODE DEMO — 3D VISUALS —&nbsp;</span>
+          <span>ODDOMODE DEMO — 3D VISUALS —&nbsp;</span>
+          <span>ODDOMODE DEMO — 3D VISUALS —&nbsp;</span>
         </div>
+      </div>
+
+      <div id="scroll-indicator">
+        <span>SCROLL</span>
+        <div id="scroll-line"></div>
       </div>
 
     </div>
@@ -728,9 +704,7 @@
       document.body.style.overflow = 'hidden';
 
       /* gsap.set MUST run before gsap.timeline */
-      gsap.set(letters,          { opacity: 0, y: 60, scale: 0.8 });
-      gsap.set('#hero-title',    { opacity: 0, y: 40 });
-      gsap.set('#hero-subtitle', { opacity: 0, y: 40 });
+      gsap.set(letters, { opacity: 0, y: 60, scale: 0.8 });
 
       gsap.timeline()
         .to(letters, {
@@ -755,95 +729,78 @@
               onLeaveBack: function() { nav.classList.remove('scrolled'); },
             });
 
-            /* Task 2a: title slams in, duration 1.2s */
-            gsap.to('#hero-title', {
-              opacity: 1, y: 0, duration: 1.2, ease: 'power4.out',
-            });
-
-            /* Task 2b: subtitle 0.3s after title */
-            gsap.to('#hero-subtitle', {
-              opacity: 1, y: 0, duration: 1.2, ease: 'power4.out', delay: 0.3,
-            });
           },
         });
     })();
 
     /* ════════════════════════════════
        SECTION 1 — HERO
-       Video scrub + speed lines + scroll indicator
+       Scale-down card + marquee on scroll
     ════════════════════════════════ */
-    (function initHero() {
-      var video      = document.getElementById('hero-video');
-      var frame      = document.getElementById('hero-video-frame');
-      var overlay    = document.getElementById('hero-video-overlay');
-      var marquee    = document.getElementById('hero-marquee');
-      var heroText   = document.getElementById('hero-text');
-      var indicator  = document.getElementById('hero-scroll-indicator');
-      var speedLines = document.querySelectorAll('.speed-line');
-      var speedFired = false;
+    function buildHeroTrigger() {
+      const wrapper     = document.getElementById('hero-video-wrapper');
+      const greyOverlay = document.getElementById('hero-grey-overlay');
+      const heroText    = document.getElementById('hero-text');
+      const marqueeWrap = document.getElementById('hero-marquee-wrap');
+      const marquee     = document.getElementById('hero-marquee');
+      const scrollEl    = document.getElementById('scroll-indicator');
 
-      video.autoplay = true;
-      video.loop     = true;
-      video.muted    = true;
-      video.play().catch(function() {});
+      /* PHASE 1: text fades in as you start scrolling (0–15%) */
+      gsap.set(heroText, { opacity: 0, y: 30 });
+      gsap.to(heroText, {
+        opacity: 1, y: 0, duration: 1, ease: 'power3.out',
+        scrollTrigger: {
+          trigger: '#hero',
+          start: 'top top',
+          end: '15% top',
+          scrub: 1,
+        },
+      });
 
+      /* Scroll indicator fades out early */
+      gsap.to(scrollEl, {
+        opacity: 0,
+        scrollTrigger: {
+          trigger: '#hero',
+          start: '5% top',
+          end: '12% top',
+          scrub: 1,
+        },
+      });
+
+      /* PHASE 2: scale-down from 70% → 100% of hero scroll */
       ScrollTrigger.create({
         trigger: '#hero',
-        start: 'top top', end: 'bottom bottom',
-        scrub: true,
-        onUpdate: function(self) {
-          var p = self.progress;
+        start: 'top top',
+        end: 'bottom top',
+        scrub: 1,
+        onUpdate: (self) => {
+          const p = self.progress;
 
-          /* Hero text fades out 60–70% so it's gone before shrink */
-          gsap.set(heroText, {
-            opacity: p > 0.60 ? 1 - Math.min(1, (p - 0.60) / 0.10) : 1,
-          });
+          /* Text fades out from 50% onward */
+          const textOpacity = p < 0.5 ? 1 : Math.max(0, 1 - (p - 0.5) * 5);
+          gsap.set(heroText, { opacity: textOpacity });
 
-          /* Scroll indicator fades after 10% */
-          gsap.set(indicator, {
-            opacity: p > 0.10 ? Math.max(0, 1 - (p - 0.10) / 0.05) : 1,
-          });
+          if (p >= 0.7) {
+            const scaleP   = (p - 0.7) / 0.3;
+            const scale    = 1 - (scaleP * 0.32);
+            const radius   = scaleP * 24;
+            const greyOp   = scaleP * 0.72;
+            const marqueeX = (scaleP * 120) - 60;
 
-          /* Speed lines fire once at 20% */
-          if (p >= 0.20 && !speedFired) {
-            speedFired = true;
-            gsap.fromTo(speedLines,
-              { left: '-100%' },
-              {
-                left: '110%', duration: 0.8, stagger: 0.06, ease: 'power2.in',
-                onComplete: function() {
-                  gsap.set(speedLines, { left: '-100%' });
-                  speedFired = false;
-                },
-              }
-            );
-          }
-
-          /* Video frame shrinks 70–100%
-             t=0: fullscreen  t=1: card with 18% H-margin, 12% V-margin, 20px radius */
-          var t  = Math.max(0, Math.min(1, (p - 0.70) / 0.30));
-          var ix = window.innerWidth  * 0.18 * t;
-          var iy = window.innerHeight * 0.12 * t;
-          gsap.set(frame, {
-            top: iy, bottom: iy, left: ix, right: ix,
-            borderRadius: 20 * t,
-          });
-
-          /* Gray overlay fades in with the shrink */
-          gsap.set(overlay, { opacity: t * 0.65 });
-
-          /* Marquee appears in the lower gap after 70% of the shrink */
-          gsap.set(marquee, { opacity: Math.max(0, (t - 0.70) / 0.30) });
-
-          /* Pause video once nearly fully shrunken; resume if scrolled back */
-          if (t > 0.92 && !video.paused) {
-            video.pause();
-          } else if (t <= 0.92 && video.paused) {
-            video.play().catch(function() {});
+            gsap.set(wrapper, { scale: scale, borderRadius: radius + 'px' });
+            gsap.set(greyOverlay, { opacity: greyOp });
+            gsap.set(marqueeWrap, { opacity: scaleP });
+            gsap.set(marquee,     { x: marqueeX + 'vw' });
+          } else {
+            gsap.set(wrapper,     { scale: 1, borderRadius: 0 });
+            gsap.set(greyOverlay, { opacity: 0 });
+            gsap.set(marqueeWrap, { opacity: 0 });
           }
         },
       });
-    })();
+    }
+    buildHeroTrigger();
 
     /* ════════════════════════════════
        SECTION 2 — STATEMENT — Task 4
