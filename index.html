@@ -18,7 +18,7 @@
   <title>VELOX</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
   <style>
     /* ════════════════════════════════
        DESIGN TOKENS
@@ -28,7 +28,8 @@
       --lime:  #C8F135;
       --cream: #F0EDE6;
       --white: #ffffff;
-      --font:  'Inter', sans-serif;
+      --font:          'DM Sans', sans-serif;
+      --font-headline: 'Barlow Condensed', sans-serif;
     }
 
     /* ════════════════════════════════
@@ -405,6 +406,22 @@
     /* ════════════════════════════════
        RESPONSIVE — MOBILE
     ════════════════════════════════ */
+    /* ════════════════════════════════
+       TYPOGRAPHY — Barlow Condensed headlines
+       Placed last so it overrides per-element letter-spacing
+    ════════════════════════════════ */
+    .preloader-letter,
+    #hero-title,
+    .statement-word,
+    .reveal-headline,
+    .spec-number,
+    #manifest-text,
+    #final-headline {
+      font-family: var(--font-headline);
+      font-weight: 900;
+      letter-spacing: -2px;
+    }
+
     @media (max-width: 768px) {
       body { cursor: auto; }
       a, button { cursor: auto; }
