@@ -1,0 +1,780 @@
+﻿<!--
+  ════════════════════════════════════════════════════════════
+  Project: VELOX Demo
+  Built by: Oddomode (oddomode.de)
+  Stack: HTML / CSS / GSAP / Lenis
+  Videos: clip1.mp4, clip2.mp4, clip3.mp4
+  Images: bild3-seite.png, bild5-silhouette.png
+  To change colors: edit :root variables
+  To change text: search section comments
+  To deploy: drag folder to vercel.com/new
+  ════════════════════════════════════════════════════════════
+-->
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VELOX</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;900&display=swap" rel="stylesheet" />
+  <style>
+    /* ════════════════════════════════
+       DESIGN TOKENS
+    ════════════════════════════════ */
+    :root {
+      --black: #0D0D0B;
+      --lime:  #C8F135;
+      --cream: #F0EDE6;
+      --white: #ffffff;
+      --font:  'Inter', sans-serif;
+    }
+
+    /* ════════════════════════════════
+       GLOBAL RESET & BASE
+    ════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: auto; }
+
+    body {
+      background: var(--black);
+      font-family: var(--font);
+      color: var(--white);
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    section { overflow: hidden; }
+    a, button { cursor: none; }
+
+    /* ════════════════════════════════
+       CUSTOM CURSOR
+    ════════════════════════════════ */
+    #cursor {
+      width: 10px; height: 10px;
+      background: var(--lime);
+      border-radius: 50%;
+      position: fixed; top: 0; left: 0;
+      pointer-events: none; z-index: 9999;
+    }
+
+    #cursor-follower {
+      width: 36px; height: 36px;
+      border: 1.5px solid var(--lime);
+      background: transparent;
+      border-radius: 50%;
+      position: fixed; top: 0; left: 0;
+      pointer-events: none; z-index: 9998;
+    }
+
+    /* ════════════════════════════════
+       SECTION 0 — PRELOADER
+    ════════════════════════════════ */
+    #preloader {
+      position: fixed; inset: 0;
+      background: var(--black);
+      z-index: 9000;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    #preloader-text { display: flex; align-items: baseline; }
+
+    .preloader-letter {
+      font-size: clamp(72px, 15vw, 180px);
+      font-weight: 900;
+      color: var(--lime);
+      line-height: 1;
+      display: inline-block;
+    }
+
+    /* ════════════════════════════════
+       SECTION 1 — HERO
+    ════════════════════════════════ */
+    #hero { height: 300vh; position: relative; }
+
+    #hero-sticky {
+      position: sticky; top: 0;
+      height: 100vh; overflow: hidden;
+    }
+
+    #hero-video {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      position: absolute; top: 0; left: 0;
+    }
+
+    #hero-vignette {
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.75) 100%);
+      pointer-events: none;
+    }
+
+    #hero-bottom-gradient {
+      position: absolute; bottom: 0; left: 0;
+      width: 100%; height: 30%;
+      background: linear-gradient(transparent, var(--black));
+      pointer-events: none;
+    }
+
+    #hero-text {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 10;
+      text-align: center;
+      width: 100%; padding: 0 24px;
+      opacity: 0;
+    }
+
+    #hero-title {
+      font-size: clamp(72px, 14vw, 200px);
+      font-weight: 900; color: var(--white);
+      letter-spacing: -4px; line-height: 0.9;
+    }
+
+    #hero-subtitle {
+      font-size: clamp(12px, 1.5vw, 18px);
+      color: var(--cream);
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      margin-top: 24px;
+    }
+
+    /* ════════════════════════════════
+       SECTION 2 — STATEMENT
+    ════════════════════════════════ */
+    #statement { height: 300vh; background: var(--black); position: relative; }
+
+    #statement-sticky {
+      position: sticky; top: 0;
+      height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+
+    .statement-word {
+      position: absolute;
+      top: 50%; left: 50%;
+      font-size: clamp(56px, 11vw, 160px);
+      font-weight: 900; color: var(--white);
+      text-align: center;
+      display: flex; flex-direction: column; align-items: center;
+      white-space: nowrap;
+    }
+
+    .statement-word-inner {
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .statement-dot {
+      width: 8px; height: 8px;
+      background: var(--lime);
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 16px;
+      flex-shrink: 0;
+    }
+
+    .statement-line {
+      width: 120px; height: 1px;
+      background: var(--lime);
+      margin-top: 20px;
+      transform-origin: left center;
+    }
+
+    /* ════════════════════════════════
+       SECTION 3 — REVEAL
+    ════════════════════════════════ */
+    #reveal { height: 400vh; position: relative; }
+
+    #reveal-sticky {
+      position: sticky; top: 0;
+      height: 100vh;
+      display: grid; grid-template-columns: 40% 60%;
+      overflow: hidden;
+    }
+
+    #reveal-left {
+      display: flex; flex-direction: column; justify-content: center;
+      padding-left: clamp(32px, 6vw, 100px);
+      padding-right: 40px;
+      position: relative; z-index: 2;
+    }
+
+    .reveal-lime-line {
+      width: 2px; height: 80px;
+      background: var(--lime);
+      margin-bottom: 24px; flex-shrink: 0;
+    }
+
+    .reveal-text-wrapper { position: relative; min-height: 140px; }
+
+    #reveal-text-a,
+    #reveal-text-b { position: absolute; top: 0; left: 0; }
+    #reveal-text-b { opacity: 0; }
+
+    .reveal-headline {
+      font-size: clamp(28px, 4vw, 52px);
+      font-weight: 900; color: var(--white); line-height: 1.1;
+    }
+
+    .reveal-subline {
+      font-size: 15px; color: var(--cream);
+      letter-spacing: 2px; margin-top: 16px;
+    }
+
+    #reveal-right { position: relative; overflow: hidden; }
+
+    .reveal-video {
+      position: absolute; top: 0; left: 0;
+      width: 100%; height: 100%; object-fit: cover;
+    }
+
+    #reveal-video-a { z-index: 1; }
+    #reveal-video-b { z-index: 2; opacity: 0; }
+
+    #reveal-left-fade {
+      position: absolute; top: 0; left: 0;
+      width: 40%; height: 100%;
+      background: linear-gradient(to right, var(--black), transparent);
+      z-index: 4; pointer-events: none;
+    }
+
+    /* ════════════════════════════════
+       SECTION 4 — SPECS
+    ════════════════════════════════ */
+    #specs { background: var(--black); padding: 140px 0; }
+
+    #specs-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 0; max-width: 1200px; margin: 0 auto;
+    }
+
+    .spec-card {
+      border-top: 2px solid var(--lime);
+      padding: 60px 48px;
+      background: transparent;
+    }
+
+    .spec-number {
+      font-size: clamp(56px, 9vw, 120px);
+      font-weight: 900; color: var(--white);
+      line-height: 1; display: block;
+    }
+
+    .spec-unit {
+      font-size: 16px; color: var(--lime);
+      font-weight: 900; letter-spacing: 3px;
+      display: block; margin-top: 8px;
+    }
+
+    .spec-label {
+      font-size: 11px; color: var(--cream);
+      letter-spacing: 4px; text-transform: uppercase;
+      margin-top: 20px; display: block;
+    }
+
+    /* ════════════════════════════════
+       SECTION 5 — MANIFEST
+    ════════════════════════════════ */
+    #manifest { height: 200vh; background: var(--black); position: relative; }
+
+    #manifest-sticky {
+      position: sticky; top: 0;
+      height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column;
+    }
+
+    #manifest-text {
+      font-size: clamp(28px, 4.5vw, 68px);
+      font-weight: 900;
+      max-width: 800px;
+      text-align: center; line-height: 1.3;
+      padding: 0 32px;
+      color: rgba(255, 255, 255, 0.08);
+    }
+
+    .manifest-word { display: inline; color: rgba(255, 255, 255, 0.08); }
+
+    #manifest-asterisk {
+      font-size: 24px; color: var(--lime);
+      margin-top: 48px; opacity: 0; display: block;
+      animation: spin 8s linear infinite;
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+
+    /* ════════════════════════════════
+       SECTION 6 — FINAL
+    ════════════════════════════════ */
+    #final {
+      min-height: 100vh; background: var(--black);
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column; position: relative; overflow: hidden;
+    }
+
+    #final-bg {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%; object-fit: cover;
+      opacity: 0.12; mix-blend-mode: screen; pointer-events: none;
+    }
+
+    #final-top-gradient {
+      position: absolute; top: 0; left: 0;
+      width: 100%; height: 200px;
+      background: linear-gradient(var(--black), transparent);
+      pointer-events: none; z-index: 1;
+    }
+
+    #final-content { position: relative; z-index: 2; text-align: center; }
+
+    #final-headline {
+      font-size: clamp(64px, 12vw, 180px);
+      font-weight: 900; color: var(--white);
+      letter-spacing: -3px; text-align: center;
+    }
+
+    #final-email {
+      font-size: 16px; color: var(--lime);
+      letter-spacing: 5px; text-transform: uppercase;
+      text-decoration: none; display: block;
+      margin-top: 32px; text-align: center;
+      transition: color 0.3s ease;
+    }
+
+    #final-email:hover { color: var(--white); }
+
+    #final-footer {
+      position: absolute; bottom: 40px;
+      width: 100%; text-align: center; z-index: 2;
+    }
+
+    #final-footer a {
+      font-size: 11px; color: rgba(255, 255, 255, 0.25);
+      letter-spacing: 3px; text-transform: uppercase;
+      text-decoration: none; transition: color 0.3s ease;
+    }
+
+    #final-footer a:hover { color: var(--lime); }
+
+    /* ════════════════════════════════
+       RESPONSIVE — MOBILE
+    ════════════════════════════════ */
+    @media (max-width: 768px) {
+      body { cursor: auto; }
+      a, button { cursor: auto; }
+      #cursor, #cursor-follower { display: none; }
+
+      #reveal { height: auto; }
+      #reveal-sticky {
+        position: relative; height: auto;
+        grid-template-columns: 1fr;
+        grid-template-rows: 50vh auto;
+      }
+      #reveal-right { order: 1; height: 50vh; position: relative; }
+      #reveal-left  { order: 2; padding: 32px 24px 48px; justify-content: flex-start; }
+      #reveal-left-fade { display: none; }
+      .reveal-text-wrapper { min-height: 120px; }
+
+      #specs-grid { grid-template-columns: 1fr; padding: 0 24px; }
+      .spec-card  { padding: 40px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══ CUSTOM CURSOR ═══ -->
+  <div id="cursor"></div>
+  <div id="cursor-follower"></div>
+
+  <!-- ═══ SECTION 0 — PRELOADER ═══ -->
+  <div id="preloader">
+    <div id="preloader-text">
+      <span class="preloader-letter">V</span>
+      <span class="preloader-letter">E</span>
+      <span class="preloader-letter">L</span>
+      <span class="preloader-letter">O</span>
+      <span class="preloader-letter">X</span>
+    </div>
+  </div>
+
+  <!-- ═══ SECTION 1 — HERO ═══ -->
+  <section id="hero">
+    <div id="hero-sticky">
+      <video id="hero-video" muted playsinline preload="auto">
+        <source src="clip1.mp4" type="video/mp4" />
+      </video>
+      <div id="hero-vignette"></div>
+      <div id="hero-bottom-gradient"></div>
+      <div id="hero-text">
+        <div id="hero-title">VELOX</div>
+        <div id="hero-subtitle">Engineered for those who feel.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ SECTION 2 — STATEMENT ═══ -->
+  <section id="statement">
+    <div id="statement-sticky">
+      <div class="statement-word" id="word-1">
+        <div class="statement-word-inner">
+          <span class="statement-dot"></span>
+          <span>KRAFT.</span>
+        </div>
+        <div class="statement-line"></div>
+      </div>
+      <div class="statement-word" id="word-2">
+        <div class="statement-word-inner">
+          <span class="statement-dot"></span>
+          <span>PRÄZISION.</span>
+        </div>
+        <div class="statement-line"></div>
+      </div>
+      <div class="statement-word" id="word-3">
+        <div class="statement-word-inner">
+          <span class="statement-dot"></span>
+          <span>OBSESSION.</span>
+        </div>
+        <div class="statement-line"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ SECTION 3 — REVEAL ═══ -->
+  <section id="reveal">
+    <div id="reveal-sticky">
+      <div id="reveal-left">
+        <div class="reveal-lime-line"></div>
+        <div class="reveal-text-wrapper">
+          <div id="reveal-text-a">
+            <div class="reveal-headline">Designed to dominate.</div>
+            <div class="reveal-subline">Jedes Detail — einem Zweck gewidmet.</div>
+          </div>
+          <div id="reveal-text-b">
+            <div class="reveal-headline">Built to perform.</div>
+            <div class="reveal-subline">720 PS. 2.4 Sekunden. 340 km/h.</div>
+          </div>
+        </div>
+      </div>
+      <div id="reveal-right">
+        <video class="reveal-video" id="reveal-video-a" muted playsinline autoplay loop>
+          <source src="clip2.mp4" type="video/mp4" />
+        </video>
+        <video class="reveal-video" id="reveal-video-b" muted playsinline autoplay loop>
+          <source src="clip3.mp4" type="video/mp4" />
+        </video>
+        <div id="reveal-left-fade"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ SECTION 4 — SPECS ═══ -->
+  <section id="specs">
+    <div id="specs-grid">
+      <div class="spec-card">
+        <span class="spec-number" data-target="2.4" data-decimals="1">0.0</span>
+        <span class="spec-unit">SEK</span>
+        <span class="spec-label">0 — 100 KM/H</span>
+      </div>
+      <div class="spec-card">
+        <span class="spec-number" data-target="720" data-decimals="0">0</span>
+        <span class="spec-unit">PS</span>
+        <span class="spec-label">BITURBO V8</span>
+      </div>
+      <div class="spec-card">
+        <span class="spec-number" data-target="340" data-decimals="0">0</span>
+        <span class="spec-unit">KM/H</span>
+        <span class="spec-label">TOPGESCHWINDIGKEIT</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ SECTION 5 — MANIFEST ═══ -->
+  <section id="manifest">
+    <div id="manifest-sticky">
+      <p id="manifest-text"></p>
+      <span id="manifest-asterisk">&#10022;</span>
+    </div>
+  </section>
+
+  <!-- ═══ SECTION 6 — FINAL ═══ -->
+  <section id="final">
+    <img id="final-bg" src="bild5-silhouette.png" alt="" aria-hidden="true" />
+    <div id="final-top-gradient"></div>
+    <div id="final-content">
+      <div id="final-headline">Bereit?</div>
+      <a id="final-email" href="mailto:kontakt@velox.de">kontakt@velox.de</a>
+    </div>
+    <div id="final-footer">
+      <a href="https://oddomode.de" target="_blank" rel="noopener noreferrer">Made by Oddomode</a>
+    </div>
+  </section>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.14/dist/lenis.min.js"></script>
+  <script>
+    /* ════════════════════════════════
+       INIT
+    ════════════════════════════════ */
+    gsap.registerPlugin(ScrollTrigger);
+
+    /* ════════════════════════════════
+       LENIS — smooth scroll integrated
+       with GSAP ticker + ScrollTrigger
+    ════════════════════════════════ */
+    const lenis = new Lenis({
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+    });
+
+    lenis.on('scroll', ScrollTrigger.update);
+
+    gsap.ticker.add((time) => {
+      lenis.raf(time * 1000);
+    });
+
+    gsap.ticker.lagSmoothing(0);
+
+    /* ════════════════════════════════
+       CUSTOM CURSOR
+    ════════════════════════════════ */
+    (function initCursor() {
+      const cursor   = document.getElementById('cursor');
+      const follower = document.getElementById('cursor-follower');
+
+      if (window.matchMedia('(hover: none)').matches) {
+        cursor.style.display = follower.style.display = 'none';
+        return;
+      }
+
+      window.addEventListener('mousemove', (e) => {
+        gsap.set(cursor,  { x: e.clientX - 5,  y: e.clientY - 5  });
+        gsap.to(follower, { x: e.clientX - 18, y: e.clientY - 18, duration: 0.12, ease: 'power2.out' });
+      });
+
+      document.querySelectorAll('a, button').forEach((el) => {
+        el.addEventListener('mouseenter', () => {
+          gsap.to(cursor,   { scale: 2.5, duration: 0.25, ease: 'power2.out' });
+          gsap.to(follower, { scale: 0,   duration: 0.25, ease: 'power2.out' });
+        });
+        el.addEventListener('mouseleave', () => {
+          gsap.to(cursor,   { scale: 1, duration: 0.25, ease: 'power2.out' });
+          gsap.to(follower, { scale: 1, duration: 0.25, ease: 'power2.out' });
+        });
+      });
+    })();
+
+    /* ════════════════════════════════
+       SECTION 0 — PRELOADER
+    ════════════════════════════════ */
+    (function initPreloader() {
+      const preloader = document.getElementById('preloader');
+      const letters   = document.querySelectorAll('.preloader-letter');
+
+      document.body.style.overflow = 'hidden';
+      lenis.stop();
+
+      gsap.set(letters, { opacity: 0, y: 60, scale: 0.8 });
+
+      gsap.timeline()
+        .to(letters, {
+          opacity: 1, y: 0, scale: 1,
+          duration: 0.4, ease: 'power4.out', stagger: 0.1,
+        })
+        .to({}, { duration: 0.5 })
+        .to(preloader, {
+          opacity: 0, duration: 0.8, ease: 'power2.inOut',
+          onComplete() {
+            preloader.style.display      = 'none';
+            document.body.style.overflow = '';
+            lenis.start();
+            ScrollTrigger.refresh();
+          },
+        });
+    })();
+
+    /* ════════════════════════════════
+       SECTION 1 — HERO VIDEO SCRUB
+    ════════════════════════════════ */
+    (function initHero() {
+      const video    = document.getElementById('hero-video');
+      const heroText = document.getElementById('hero-text');
+
+      video.pause();
+      video.addEventListener('loadedmetadata', () => video.pause());
+
+      ScrollTrigger.create({
+        trigger: '#hero',
+        start: 'top top', end: 'bottom bottom',
+        scrub: true,
+        onUpdate(self) {
+          const p = self.progress;
+
+          if (video.readyState >= 1) {
+            video.currentTime = p * video.duration;
+          }
+
+          /* text: fade in 10-20%, solid 20-75%, fade out 75-85% */
+          let alpha = 0;
+          if      (p >= 0.10 && p < 0.20)  alpha = (p - 0.10) / 0.10;
+          else if (p >= 0.20 && p <= 0.75) alpha = 1;
+          else if (p >  0.75 && p <= 0.85) alpha = 1 - (p - 0.75) / 0.10;
+
+          gsap.set(heroText, { opacity: alpha });
+        },
+      });
+    })();
+
+    /* ════════════════════════════════
+       SECTION 2 — STATEMENT WORDS
+    ════════════════════════════════ */
+    (function initStatement() {
+      const words = [
+        document.getElementById('word-1'),
+        document.getElementById('word-2'),
+        document.getElementById('word-3'),
+      ];
+      const lines = words.map((w) => w.querySelector('.statement-line'));
+
+      /* center via GSAP so scale has correct visual origin */
+      words.forEach((w) => gsap.set(w, { xPercent: -50, yPercent: -50, opacity: 0, scale: 0.85 }));
+      lines.forEach((l) => gsap.set(l, { scaleX: 0 }));
+
+      const zones = [[0, 0.33], [0.33, 0.66], [0.66, 1.0]];
+
+      ScrollTrigger.create({
+        trigger: '#statement',
+        start: 'top top', end: 'bottom bottom',
+        scrub: true,
+        onUpdate(self) {
+          const p = self.progress;
+          zones.forEach(([start, end], i) => {
+            let opacity, scale, lineScale;
+            if (p <= start || p >= end) {
+              opacity = 0; scale = 0.85; lineScale = 0;
+            } else {
+              const local = (p - start) / (end - start);
+              if (local < 0.15) {
+                const t = local / 0.15;
+                opacity = t; scale = 0.85 + 0.15 * t;
+              } else if (local > 0.85) {
+                const t = (local - 0.85) / 0.15;
+                opacity = 1 - t; scale = 1 - 0.15 * t;
+              } else {
+                opacity = 1; scale = 1;
+              }
+              lineScale = Math.min(1, local / 0.30);
+            }
+            gsap.set(words[i], { opacity, scale });
+            gsap.set(lines[i], { scaleX: lineScale });
+          });
+        },
+      });
+    })();
+
+    /* ════════════════════════════════
+       SECTION 3 — REVEAL CROSSFADE
+    ════════════════════════════════ */
+    (function initReveal() {
+      const textA = document.getElementById('reveal-text-a');
+      const textB = document.getElementById('reveal-text-b');
+      const vidA  = document.getElementById('reveal-video-a');
+      const vidB  = document.getElementById('reveal-video-b');
+
+      ScrollTrigger.create({
+        trigger: '#reveal',
+        start: 'top top', end: 'bottom bottom',
+        scrub: true,
+        onUpdate(self) {
+          /* crossfade window: 40% to 60% of section scroll */
+          const fade = Math.max(0, Math.min(1, (self.progress - 0.40) / 0.20));
+          gsap.set(textA, { opacity: 1 - fade });
+          gsap.set(textB, { opacity: fade });
+          gsap.set(vidA,  { opacity: 1 - fade });
+          gsap.set(vidB,  { opacity: fade });
+        },
+      });
+    })();
+
+    /* ════════════════════════════════
+       SECTION 4 — SPECS COUNTERS
+    ════════════════════════════════ */
+    (function initSpecs() {
+      const cards = document.querySelectorAll('.spec-card');
+
+      gsap.set(cards, { opacity: 0, y: 50 });
+
+      gsap.to(cards, {
+        y: 0, opacity: 1, stagger: 0.15, duration: 0.8, ease: 'power2.out',
+        scrollTrigger: { trigger: '#specs', start: 'top 80%', once: true },
+      });
+
+      cards.forEach((card) => {
+        const el       = card.querySelector('.spec-number');
+        const target   = parseFloat(el.dataset.target);
+        const decimals = parseInt(el.dataset.decimals, 10);
+
+        ScrollTrigger.create({
+          trigger: card, start: 'top 80%', once: true,
+          onEnter() {
+            const obj = { val: 0 };
+            gsap.to(obj, {
+              val: target, duration: 2, ease: 'power2.out',
+              onUpdate() {
+                el.textContent = decimals > 0
+                  ? obj.val.toFixed(decimals)
+                  : Math.round(obj.val).toString();
+              },
+            });
+          },
+        });
+      });
+    })();
+
+    /* ════════════════════════════════
+       SECTION 5 — MANIFEST ILLUMINATE
+    ════════════════════════════════ */
+    (function initManifest() {
+      const container = document.getElementById('manifest-text');
+      const asterisk  = document.getElementById('manifest-asterisk');
+      const words     = 'Nicht jeder versteht VELOX. Das ist so gewollt.'.split(' ');
+
+      words.forEach((word, i) => {
+        const span = document.createElement('span');
+        span.className   = 'manifest-word';
+        span.textContent = word;
+        container.appendChild(span);
+        if (i < words.length - 1) container.appendChild(document.createTextNode(' '));
+      });
+
+      const wordSpans = container.querySelectorAll('.manifest-word');
+      const total     = wordSpans.length;
+
+      ScrollTrigger.create({
+        trigger: '#manifest',
+        start: 'top top', end: 'bottom bottom',
+        scrub: true,
+        onUpdate(self) {
+          const p = self.progress;
+
+          wordSpans.forEach((span, i) => {
+            const local = Math.max(0, Math.min(1, (p - i / total) / (1 / total)));
+            span.style.color = 'rgba(255,255,255,' + (0.08 + local * 0.92).toFixed(3) + ')';
+          });
+
+          gsap.set(asterisk, {
+            opacity: Math.max(0, Math.min(1, (p - 0.90) / 0.10)),
+          });
+        },
+      });
+    })();
+  </script>
+</body>
+</html>
