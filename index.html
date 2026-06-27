@@ -645,7 +645,6 @@
        INIT
     ════════════════════════════════ */
     gsap.registerPlugin(ScrollTrigger);
-    ScrollTrigger.normalizeScroll(true);
     gsap.ticker.lagSmoothing(0);
 
     /* ════════════════════════════════
@@ -729,6 +728,7 @@
               onLeaveBack: function() { nav.classList.remove('scrolled'); },
             });
 
+            buildHeroTrigger();
           },
         });
     })();
@@ -745,17 +745,8 @@
       const marquee     = document.getElementById('hero-marquee');
       const scrollEl    = document.getElementById('scroll-indicator');
 
-      /* PHASE 1: text fades in as you start scrolling (0–15%) */
-      gsap.set(heroText, { opacity: 0, y: 30 });
-      gsap.to(heroText, {
-        opacity: 1, y: 0, duration: 1, ease: 'power3.out',
-        scrollTrigger: {
-          trigger: '#hero',
-          start: 'top top',
-          end: '15% top',
-          scrub: 1,
-        },
-      });
+      /* Text always visible — onUpdate handles fade-out at 50%+ */
+      gsap.set(heroText, { opacity: 1, y: 0 });
 
       /* Scroll indicator fades out early */
       gsap.to(scrollEl, {
@@ -800,7 +791,6 @@
         },
       });
     }
-    buildHeroTrigger();
 
     /* ════════════════════════════════
        SECTION 2 — STATEMENT — Task 4
