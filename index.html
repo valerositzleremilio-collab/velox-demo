@@ -790,10 +790,14 @@
         );
       }
 
+      /* Guarantee word-1 is visible before ScrollTrigger attaches */
+      gsap.set(words[0], { opacity: 1 });
+
       ScrollTrigger.create({
         trigger: '#statement',
         start: 'top top', end: 'bottom bottom',
         scrub: false,
+        markers: false,
         onUpdate: function(self) {
           /* Map progress to 3 equal zones: 0, 1, 2 */
           var newIdx = Math.min(2, Math.floor(self.progress * 3));
@@ -849,7 +853,7 @@
 
       gsap.to(cards, {
         y: 0, stagger: 0.15, duration: 0.8, ease: 'power2.out',
-        scrollTrigger: { trigger: '#specs', start: 'top 95%', once: true },
+        scrollTrigger: { trigger: '#specs', start: 'top 70%', once: true },
       });
 
       cards.forEach(function(card) {
@@ -858,7 +862,7 @@
         var decimals = parseInt(el.dataset.decimals, 10);
 
         ScrollTrigger.create({
-          trigger: card, start: 'top 95%', once: true,
+          trigger: card, start: 'top 70%', once: true,
           onEnter: function() {
             var obj = { val: 0 };
             gsap.to(obj, {
@@ -927,14 +931,14 @@
       gsap.to('.final-letter', {
         opacity: 1, y: 0,
         stagger: 0.04, duration: 0.7, ease: 'power4.out',
-        scrollTrigger: { trigger: '#final', start: 'top 75%', once: true },
+        scrollTrigger: { trigger: '#final', start: 'top 60%', once: true },
       });
 
       /* CTA button — no delay on scrollTrigger version */
       gsap.set('#final-email', { opacity: 0, y: 30 });
       gsap.to('#final-email', {
         opacity: 1, y: 0, duration: 0.8, ease: 'power3.out',
-        scrollTrigger: { trigger: '#final', start: 'top 75%', once: true },
+        scrollTrigger: { trigger: '#final', start: 'top 60%', once: true },
       });
     })();
   </script>
