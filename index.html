@@ -124,7 +124,7 @@
     /* ════════════════════════════════
        SECTION 1 — HERO
     ════════════════════════════════ */
-    #hero { height: 300vh; position: relative; }
+    #hero { height: 400vh; position: relative; }
     #hero-sticky {
       position: sticky;
       top: 0;
@@ -772,19 +772,23 @@
           const textOpacity = p < 0.5 ? 1 : Math.max(0, 1 - (p - 0.5) * 5);
           gsap.set(heroText, { opacity: textOpacity });
 
-          if (p >= 0.7) {
-            const scaleP   = (p - 0.7) / 0.3;
-            const scale    = 1 - (scaleP * 0.32);
+          if (p >= 0.55) {
+            const scaleP   = Math.min(1, (p - 0.55) / 0.25);
+            const scale    = 1 - (scaleP * 0.52);
             const radius   = scaleP * 24;
             const greyOp   = scaleP * 0.72;
             const marqueeX = (scaleP * 120) - 60;
 
-            gsap.set(wrapper, { scale: scale, borderRadius: radius + 'px' });
+            gsap.set(wrapper, {
+              scale: scale,
+              borderRadius: radius + 'px',
+              outline: scaleP >= 1 ? '1px solid rgba(200,241,53,0.3)' : 'none',
+            });
             gsap.set(greyOverlay, { opacity: greyOp });
             gsap.set(marqueeWrap, { opacity: scaleP });
             gsap.set(marquee,     { x: marqueeX + 'vw' });
           } else {
-            gsap.set(wrapper,     { scale: 1, borderRadius: 0 });
+            gsap.set(wrapper,     { scale: 1, borderRadius: 0, outline: 'none' });
             gsap.set(greyOverlay, { opacity: 0 });
             gsap.set(marqueeWrap, { opacity: 0 });
           }
